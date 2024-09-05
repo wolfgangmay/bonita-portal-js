@@ -1,0 +1,57 @@
+name: Bonita Release 10.1.0 Build Workflow
+
+on:
+  push:
+    tags:
+      - '10.1.0'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Bonita Engine
+      uses: actions/checkout@v2
+      with:
+        repository: 'bonitasoft/bonita-engine'
+        path: 'bonita-engine'
+        ref: 'tags/10.1.0'
+
+    - name: Set up JDK
+      uses: actions/setup-java@v2
+      with:
+        java-version: '11'
+        distribution: 'adopt'
+
+    - name: Build Bonita Engine
+      run: ./gradlew publishToMavenLocal
+      working-directory: bonita-engine
+
+    - name: Checkout Bonita Portal JS
+      uses: actions/checkout@v2
+      with:
+        repository: 'bonitasoft/bonita-portal-js'
+        path: 'bonita-portal-js'
+        ref: 'tags/10.1.0'
+
+    - name: Build Bonita Portal JS
+      run: ./mvnw clean package
+      working-directory: bonita-portal-js
+
+    - name: Checkout bonita-ui-designer 
+      uses: actions/checkout@v2
+      with:
+        repository: 'bonitasoft/bonita-ui-designer'
+        path: 'bonita-studio'
+        ref: 'tags/1.19.0'
+
+    - name: Build bonita-ui-designer
+      run: ./mvnw clean package
+      working-directory: bonita-ui-designer
+
+    - name: Checkout Bonita bonita-web-pages 
+      uses: actions/checkout@v2
+      with:
+        repository: 'bonitasoft/bonita-web-pages'
+        path: 'bonita-connectors'
+        ref: 'tags/10.1.0'
